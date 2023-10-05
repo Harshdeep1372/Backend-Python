@@ -1,0 +1,75 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    
+</head>
+
+<body>
+    
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-section set-bg" data-setbg="{% static 'img/breadcrumb.jpg' %}">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <div class="breadcrumb__text">
+                        <h2>Profile</h2>
+                        <div class="breadcrumb__option">
+                            <a href="/">Home</a>
+                            <span>Profile</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- signup Form Begin -->
+    <div class="contact-form spad">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="contact__form__title">
+                        <h2>User Profile</h2>
+                    </div>
+                </div>
+            </div>
+            {% if msg %}
+                <b style="color:blue;">{{msg}}</b>
+            {% endif %}
+            <form action="{% url 'profile' %}" method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-lg-6 col-md-6">
+                        <input type="text" name="fname" placeholder="Your First Name" value="{{user.fname}}">
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <input type="text" name="lname" placeholder="Your Last Name" value="{{user.lname}}">
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <input type="email" name="email" placeholder="Your Email" value="{{user.email}}" readonly>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <input type="tel" name="mobile" placeholder="Your Mobile Number" value="{{user.mobile}}">
+                    </div>
+                    <div class="col-lg-12 col-md-6">
+                        <textarea name="address" placeholder="Your Address">{{user.address}}</textarea>
+                    </div>
+                    <div class="col-lg-12 text-center">
+                        <button type="submit" class="site-btn">Update Profile</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Signup Form End -->
+</body>
+
+</html>
+
+{% endblock %}
