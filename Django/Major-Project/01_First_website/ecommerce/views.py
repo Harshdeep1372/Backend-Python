@@ -1,12 +1,29 @@
 from django.shortcuts import render,redirect
-from . models import User
+from . models import User,Product,Wishlist,Cart
 import requests
 import random
+from django.http import JsonResponse,HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+import stripe
+from django.conf import settings
+
+
+stripe.api_key = settings.STRIPE_PRIVATE_KEY
+YOUR_DOMAIN = 'http://localhost:8000'
 
 # Create your views here.
 
 def index(request):
-	return render(request,'index.html')
+	products=Product.objects.all()
+	try:
+		user=User.objects.get(email=request.session['email'])
+		if user.usertype=="buyer":
+			return render(request,'index.html',{'products':products})
+		else:
+			return render(request,'seller-index.html')
+	except:
+		return render(request,'index.html',{'products':products})
 
 def shop_grid(request):
 	return render(request,'shop-grid.html')
@@ -32,6 +49,7 @@ def signup(request):
 		except:
 			if request.POST['password']==request.POST['cpassword']:
 				User.objects.create(
+						usertype=request.POST['usertype'],
 						fname=request.POST['fname'],
 						lname=request.POST['lname'],
 						email=request.POST['email'],
@@ -52,9 +70,18 @@ def login(request):
 		try:
 			user=User.objects.get(email=request.POST['email'])
 			if user.password==request.POST['password']:
-				request.session['email']=user.email
-				request.session['fname']=user.fname
-				return render(request,'index.html')
+				if user.usertype=="buyer":
+					request.session['email']=user.email
+					request.session['fname']=user.fname
+					wishlists=Wishlist.objects.filter(user=user)
+					request.session['wishlist_count']=len(wishlists)
+					carts=Cart.objects.filter(user=user)
+					request.session['cart_count']=len(carts)
+					return redirect('index')
+				else:
+					request.session['email']=user.email
+					request.session['fname']=user.fname
+					return render(request,'seller-index.html')
 			else:
 				msg="Password is Incorrect"
 				return render(request,'login.html',{'msg':msg})
@@ -83,25 +110,41 @@ def change_password(request):
 				return redirect('logout')
 			else:
 				msg="New Password & Confirm New Password Does Not Matched"
-				return render(request,'change-password.html',{'msg':msg})
+				if user.usertype=="buyer":
+					return render(request,'change-password.html',{'msg':msg})
+				else:
+					return render(request,'seller-change-password.html',{'msg':msg})
 		else:
 			msg="Old Password is Incorrect"
-			return render(request,'change-password.html',{'msg':msg})
+			if user.usertype=="buyer":
+				return render(request,'change-password.html',{'msg':msg})
+			else:
+				return render(request,'seller-change-password.html',{'msg':msg})
 	else:
-		return render(request,'change-password.html')
+		if user.usertype=="buyer":
+			return render(request,'change-password.html')
+		else:
+			return render(request,'seller-change-password.html')
 
 def profile(request):
 	user=User.objects.get(email=request.session['email'])
 	if request.method=="POST":
+		user.usertype=request.POST['usertype']
 		user.fname=request.POST['fname']
 		user.lname=request.POST['lname']
 		user.mobile=request.POST['mobile']
 		user.address=request.POST['address']
 		user.save()
 		msg="User Profile Updated Successfully"
-		return render(request,'profile.html',{'user':user,'msg':msg})
+		if user.usertype=="buyer":
+			return render(request,'profile.html',{'user':user,'msg':msg})
+		else:
+			return render(request,'seller-profile.html',{'user':user,'msg':msg})
 	else:
-		return render(request,'profile.html',{'user':user})
+		if user.usertype=="buyer":
+			return render(request,'profile.html',{'user':user})
+		else:
+			return render(request,'seller-profile.html',{'user':user})
 
 def forgot_password(request):
 	if request.method=="POST":
@@ -146,3 +189,171 @@ def new_password(request):
 		msg="New Password & Confirm New Password Does Not Matched"
 		return render(request,'new-password.html',{'mobile':mobile,'msg':msg})
 
+def seller_index(request):
+	return render(request,'seller-index.html')
+
+def seller_add_product(request):
+	seller=User.objects.get(email=request.session['email'])
+	if request.method=="POST":
+		Product.objects.create(
+				seller=seller,
+				product_name=request.POST['product_name'],
+				product_price=request.POST['product_price'],
+				product_desc=request.POST['product_desc'],
+				product_image=request. FILES['product_image']			
+			)
+		msg="Product Added Successfully"
+		return render(request,'seller-add-product.html',{'msg':msg})
+	else:
+		return render(request,'seller-add-product.html')
+
+def seller_view_product(request):
+	seller=User.objects.get(email=request.session['email'])
+	products=Product.objects.filter(seller=seller)
+	return render(request,'seller-view-product.html',{'products':products})
+
+def seller_product_details(request,pk):
+	product=Product.objects.get(pk=pk)
+	return render(request,'seller-product-details.html',{'product':product})
+
+def product_details(request,pk):
+	wishlist_flag=False
+	cart_flag=False
+	user=User()
+	product=Product.objects.get(pk=pk)
+	try:
+		user=User.objects.get(email=request.session['email'])
+	except:
+		return render(request,'login.html')
+	try:
+		Wishlist.objects.get(user=user,product=product)
+		wishlist_flag=True
+	except:
+		pass
+		return render(request,'product-details.html',{'product':product,'wishlist_flag':wishlist_flag,'cart_flag':cart_flag})
+
+	try:
+		Cart.objects.get(user=user,product=product)
+		cart_flag=True
+	except:
+		pass
+	return render(request,'product-details.html',{'product':product,'wishlist_flag':wishlist_flag,'cart_flag':cart_flag})
+
+def seller_product_edit(request,pk):
+	product=Product.objects.get(pk=pk)
+	if request.method=="POST":
+		product.product_name=request.POST['product_name']
+		product.product_price=request.POST['product_price']
+		product.product_desc=request.POST['product_desc']
+		try:
+			product.product_image=request.FILES['product_image']
+		except:
+			pass
+		product.save()
+		msg="Product Updated Successfully"
+		return render(request,'seller-product-edit.html',{'msg':msg,'product':product})
+	else:
+		return render(request,'seller-product-edit.html',{'product':product})
+
+def seller_product_delete(request,pk):
+	product=Product.objects.get(pk=pk)
+	product.delete()
+	return redirect('seller-view-product')
+
+def add_to_wishlist(request,pk):
+	user=User.objects.get(email=request.session['email'])
+	product=Product.objects.get(pk=pk)
+	wishlist=Wishlist.objects.create(user=user,product=product)
+	return redirect('wishlist')
+
+def wishlist(request):
+	user=User.objects.get(email=request.session['email'])
+	wishlists=Wishlist.objects.filter(user=user)
+	request.session['wishlist_count']=len(wishlists)
+	return render(request,'wishlist.html',{'wishlists':wishlists})
+
+def remove_from_wishlist(request,pk):
+	user=User.objects.get(email=request.session['email'])
+	product=Product.objects.get(pk=pk)
+	wishlist=Wishlist.objects.get(user=user,product=product)
+	wishlist.delete()
+	return redirect('wishlist')
+
+def add_to_cart(request,pk):
+	user=User.objects.get(email=request.session['email'])
+	product=Product.objects.get(pk=pk)
+	product_price=product.product_price
+	product_qty=1
+	cart=Cart.objects.create(
+		user=user,
+		product=product,
+		product_qty=product_qty,
+		total_price=product_qty*product_price
+		)
+	return redirect('cart')
+
+def cart(request):
+	net_price=0
+	user=User.objects.get(email=request.session['email'])
+	carts=Cart.objects.filter(user=user)
+	for i in carts:
+		net_price+=i.total_price
+	request.session['cart_count']=len(carts)
+	return render(request,'cart.html',{'carts':carts,'net_price':net_price})
+
+def remove_from_cart(request,pk):
+	user=User.objects.get(email=request.session['email'])
+	product=Product.objects.get(pk=pk)
+	cart=Cart.objects.get(user=user,product=product)
+	cart.delete()
+	return redirect('cart')
+
+def change_qty(request):
+	product_qty=int(request.POST['product_qty'])
+	pk=int(request.POST['cid'])
+	cart=Cart.objects.get(pk=pk)
+	product_price=cart.product.product_price
+	total_price=product_qty*product_price
+	cart.product_qty=product_qty
+	cart.total_price=total_price
+	cart.save()
+	return redirect('cart')
+
+@csrf_exempt
+def create_checkout_session(request):
+	amount = int(json.load(request)['post_data'])
+	final_amount=amount*100
+	session = stripe.checkout.Session.create(
+		payment_method_types=['card'],
+		line_items=[{
+			'price_data': {
+				'currency': 'inr',
+				'product_data': {
+					'name': 'Checkout Session Data',
+					},
+				'unit_amount': final_amount,
+				},
+			'quantity': 1,
+			}],
+		mode='payment',
+		success_url=YOUR_DOMAIN + '/success.html',
+		cancel_url=YOUR_DOMAIN + '/cancel.html',)
+	return JsonResponse({'id': session.id})
+
+def success(request):
+	user=User.objects.get(email=request.session['email'])
+	carts=Cart.objects.filter(user=user,payment_status=False)
+	for i in carts:
+		i.payment_status=True
+		i.save()
+	carts=Cart.objects.filter(user=user,payment_status=False)
+	request.session['cart_count']=len(carts)
+	return render(request,'success.html')
+
+def cancel(request):
+	return render(request,'cancel.html')
+
+def myorder(request):
+	user=User.objects.get(email=request.session['email'])
+	carts=Cart.objects.filter(user=user,payment_status=True)
+	return render(request,'myorder.html',{'carts':carts})

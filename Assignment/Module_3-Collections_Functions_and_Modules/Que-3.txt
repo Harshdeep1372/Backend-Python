@@ -1,0 +1,3 @@
+Que-3 : Differentiate between append () and extend () methods?
+
+------> The append() method in the Python programming language adds an item to a list that 	already exists whereas the extend() method adds each of the iterable elements 	which is supplied as a parameter to the end of the original list.
