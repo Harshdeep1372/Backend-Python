@@ -1,4 +1,4 @@
 Que-13 : Explain Exception handling? What is an Error in Python?
--------> Exception handling : If you have some suspicious code that may raise an 			      exception, you can defend your program by placing the 			      suspicious code in a try: block. After the try: block, 			      include an except: statement, followed by a block of code 			      which handles the problem as elegantly as possible.
+Ans---> Exception handling : If you have some suspicious code that may raise a exception, you can defend your program by placing the 	suspicious code in a try: block. After the try: block, include an except: statement, followed by a block of code 			      which handles the problem as elegantly as possible.
 	
-	 Error : Errors are the problems in a program due to which the program will stop 		 the execution.
+	 Error : Errors are the problems in a program due to which the program will stop the execution.
