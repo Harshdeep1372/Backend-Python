@@ -1,2 +1,0 @@
-Que-28 : What relationship is appropriate for Course and Faculty?
--------> association relationship
