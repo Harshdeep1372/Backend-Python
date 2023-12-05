@@ -1,10 +1,11 @@
 Que-1 : Why Django should be used for web-development? Explain how you can create a project in Django?
-------> Django is a fast and simple framework that helps to save development time and therefore increase the overall cost-effectiveness of the project.
+ANS---> Django is a fast and simple framework that helps to save development time and therefore increase the overall cost-effectiveness of the project. Also, Django has one of the best out-of-the-box security systems out there. It helps developers avoid common security issues that could otherwise incur additional costs later.
       
       - Some Step's to create a project in Django : 
-
-	(1)pip install django - For Install Django
-	(2)django-admin startproject projectname - For Create a Django Project
-	(3)python manage.py startapp appname - For Create a Django App
-	(4)python manage.py migrate - For Create Database
-	(5)python manage.py runserver - For Run the Development Server
+	(1)create virtual env. ---> python -m venv (Any Name)
+	(2)pip install django - For Install Django
+	(3)django-admin startproject projectname - For Create a Django Project
+	(4)python manage.py startapp appname - For Create a Django App
+	(5)python manage.py makemigrations - For Create Database
+	(6)python manage.py migrate - for mgrate the database
+	(7)python manage.py runserver - For Run the Development Server

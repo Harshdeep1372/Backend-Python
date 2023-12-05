@@ -1,2 +1,2 @@
 Que-6 : Mention what command line can be used to load data into Django?
-------> Django provides a management command called 'loaddata' that allows you to load data into your Django application from fixture files. Fixture files are 	serialized representations of Django models, typically in JSON, XML, or YAML format. 
+------> Django provides a management command called 'loaddata' that allows you to load data into your Django application from fixture files. Fixture files are serialized representations of Django models, typically in JSON, XML, or YAML format. 
