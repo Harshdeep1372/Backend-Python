@@ -30,6 +30,9 @@ class FruitManager:
             print(f"{fruit_n} Fruit Detaails update successfullyyyy.....")
         else:
             print(f"{fruit_n} not found in the furit stock.")
+class FruitCoustmer:
+    view_fruit=FruitManager.view_fruit
+    print(view_fruit)
 
 def main():
     transactions = []
@@ -64,7 +67,7 @@ def main():
 
         elif role == "2":
             print("Customer")
-            fruit_manager.view_fruit()
+            print(FruitCoustmer)
 
         else:
             print("Invalid role.")
