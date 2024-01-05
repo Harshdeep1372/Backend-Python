@@ -1,35 +1,35 @@
 class FruitManager:
     fruit_stock = {}
 
-    def add_fruit_stock(self):
-        fruit_name = input("Enter fruit Name: ")
-        quantity = input("Enter qty (in kg): ")
+    def add_fruit(self):
+        fruit_n = input("Enter fruit Name: ")
+        quan = input("Enter qty (in kg): ")
         price = input("Enter price: ")
 
-        if fruit_name in self.fruit_stock:
-            self.fruit_stock[fruit_name]['qty'] += int(quantity)
-            self.fruit_stock[fruit_name]['price'] = price
+        if fruit_n in self.fruit_stock:
+            self.fruit_stock[fruit_n]['qty'] += int(quan)
+            self.fruit_stock[fruit_n]['price'] = int(price)
         else:
-            self.fruit_stock[fruit_name] = {'qty': int(quantity), 'price': price}
+            self.fruit_stock[fruit_n] = {'qty': int(quan), 'price': price}
 
-        print("Fruit stock added successfully.")
+        print("Fruit add successfully adddeddd.")
 
-    def view_fruit_stock(self):
+    def view_fruit(self):
         print("Fruit Stock:")
         print(self.fruit_stock)
 
-    def update_fruit_stock(self):
-        fruit_name = input("Enter fruit Name to update: ")
-        if fruit_name in self.fruit_stock:
-            quantity = input("Enter new qty (in kg): ")
+    def update_fruit(self):
+        fruit_n = input("Enter fruit to updateddd: ")
+        if fruit_n in self.fruit_stock:
+            quan = input("Enter new quantaity (in kg....): ")
             price = input("Enter new price: ")
 
-            self.fruit_stock[fruit_name]['qty'] = int(quantity)
-            self.fruit_stock[fruit_name]['price'] = price
+            self.fruit_stock[fruit_n]['qty'] += int(quan)
+            self.fruit_stock[fruit_n]['price'] = int(price)
 
-            print(f"{fruit_name} stock updated successfully.")
+            print(f"{fruit_n} Fruit Detaails update successfullyyyy.....")
         else:
-            print(f"{fruit_name} not found in the stock.")
+            print(f"{fruit_n} not found in the furit stock.")
 
 def main():
     transactions = []
@@ -45,18 +45,18 @@ def main():
 
             while True:
                 print("Fruit Market Manager")
-                print("1) Add Fruit Stock\n2) View Fruit Stock\n3) Update Fruit stock")
+                print("1) Add Fruit In Stock\n2) View Fruit Stock\n3) Update Fruit In stock")
 
                 option = input("Enter your choice : ")
 
                 if option == "1":
-                    fruit_manager.add_fruit_stock()
+                    fruit_manager.add_fruit()
                 elif option == "2":
-                    fruit_manager.view_fruit_stock()
+                    fruit_manager.view_fruit()
                 elif option == "3":
-                    fruit_manager.update_fruit_stock()
+                    fruit_manager.update_fruit()
                 else:
-                    print("Invalid option.")
+                    print("Invalid option you Choose.")
 
                 more_operations = input("Do you want to perform more operations? Press 'y' for yes and 'n' for no: ")
                 if more_operations.lower() != 'y':
@@ -64,7 +64,7 @@ def main():
 
         elif role == "2":
             print("Customer")
-            # Implement customer functionality here
+            fruit_manager.view_fruit()
 
         else:
             print("Invalid role.")
