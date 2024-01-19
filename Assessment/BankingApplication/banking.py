@@ -1,12 +1,12 @@
-class BankManageSystem:
+class BankManagementSystem:
     def __init__(self):
         self.customers = {}
 
-    def add_cust(self, customer_id, name, balance):
+    def add_customer(self, customer_id, name, balance):
         self.customers[customer_id] = {'Name': name, 'Balance': balance}
         print(f"Customer {name} added successfully!")
 
-    def view_cust(self, customer_id):
+    def view_customer(self, customer_id):
         customer = self.customers.get(customer_id)
         if customer:
             print(f"Customer ID: {customer_id}")
@@ -15,27 +15,27 @@ class BankManageSystem:
         else:
             print(f"Customer with ID {customer_id} not found.")
 
-    def search_cust(self, name):
+    def search_customer(self, name):
         found_customers = [(customer_id, customer) for customer_id, customer in self.customers.items() if name.lower() in customer['Name'].lower()]
         if found_customers:
             for customer_id, customer in found_customers:
                 print(f"Customer ID: {customer_id}, Name: {customer['Name']}, Balance: {customer['Balance']}")
         else:
-            print(f"No customers found with this name {name}.")
+            print(f"No customers found with the name {name}.")
 
-    def view_all_cust(self):
+    def view_all_customers(self):
         if self.customers:
             for customer_id, customer in self.customers.items():
                 print(f"Customer ID: {customer_id}, Name: {customer['Name']}, Balance: {customer['Balance']}")
         else:
             print("No customers in the bank.")
 
-    def tot_amount_in_bank(self):
+    def total_amount_in_bank(self):
         total_amount = sum(customer['Balance'] for customer in self.customers.values())
         print(f"Total amount in the bank: {total_amount}")
 
 
-class CustomerApp:
+class CustomerApplication:
     def __init__(self, bank_system):
         self.bank_system = bank_system
         self.customer_id = None
@@ -71,8 +71,8 @@ class CustomerApp:
 
 
 def main():
-    bank_system = BankManageSystem()
-    customer_app = CustomerApp(bank_system)
+    bank_system = BankManagementSystem()
+    customer_app = CustomerApplication(bank_system)
 
     while True:
         print("\nWELCOME TO PYTHON BANK MANAGEMENT SYSTEM")
@@ -99,17 +99,17 @@ def main():
                     customer_id = input("Enter Customer ID: ")
                     name = input("Enter Customer Name: ")
                     balance = float(input("Enter Initial Balance: "))
-                    bank_system.add_cust(customer_id, name, balance)
+                    bank_system.add_customer(customer_id, name, balance)
                 elif banker_choice == '2':
                     customer_id = input("Enter Customer ID: ")
-                    bank_system.view_cust(customer_id)
+                    bank_system.view_customer(customer_id)
                 elif banker_choice == '3':
                     name = input("Enter Customer Name to search: ")
-                    bank_system.search_cust(name)
+                    bank_system.search_customer(name)
                 elif banker_choice == '4':
-                    bank_system.view_all_cust()
+                    bank_system.view_all_customers()
                 elif banker_choice == '5':
-                    bank_system.tot_amount_in_bank()
+                    bank_system.total_amount_in_bank()
                 elif banker_choice == '6':
                     break
                 else:
