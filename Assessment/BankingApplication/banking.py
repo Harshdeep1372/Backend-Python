@@ -21,7 +21,7 @@ class BankManageSystem:
             for customer_id, customer in found_customers:
                 print(f"Customer ID: {customer_id}, Name: {customer['Name']}, Balance: {customer['Balance']}")
         else:
-            print(f"No customers found with the name {name}.")
+            print(f"No customers found with this name {name}.")
 
     def view_all_cust(self):
         if self.customers:
